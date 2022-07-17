@@ -2,10 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-
-
-pragma solidity ^0.8.0;
-
 interface DaiToken {
     function transfer(address dst, uint wad) external returns (bool);
     function balanceOf(address guy) external view returns (uint);
