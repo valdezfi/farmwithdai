@@ -2,78 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-interface DaiToken {
-    function transfer(address dst, uint wad) external returns (bool);
-    function balanceOf(address guy) external view returns (uint);
-    function totalSupply() external  returns (uint);
-    function allowance(address tokenlender, address spender) external  returns (uint remaining);
-    function approve(address spender, uint tokens) external returns (bool success);
-    function transferFrom(address from, address to, uint tokens) external returns (bool success);
 
-    event Transfer(address indexed from, address indexed to, uint tokens);
-    event Approval(address indexed tokenlender, address indexed spender, uint tokens);
-
-}
-
-
-
-
-
-
-contract DappToken {
-    string  public name = "DApp Token";
-    string  public symbol = "DAPP";
-    uint256 public totalSupply = 1000000000000000000000000; // 1 million tokens
-    uint8   public decimals = 18;
-
-    event Transfer(
-        address indexed _from,
-        address indexed _to,
-        uint256 _value
-    );
-
-    event Approval(
-        address indexed _owner,
-        address indexed _spender,
-        uint256 _value
-    );
-
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
-
-    constructor() public {
-        balanceOf[msg.sender] = totalSupply;
-    }
-
-    function transfer(address _to, uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);
-        balanceOf[msg.sender] -= _value;
-        balanceOf[_to] += _value;
-        emit Transfer(msg.sender, _to, _value);
-        return true;
-    }
-
-    function approve(address _spender, uint256 _value) public returns (bool success) {
-        allowance[msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _value);
-        return true;
-    }
-
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= balanceOf[_from]);
-        require(_value <= allowance[_from][msg.sender]);
-        balanceOf[_from] -= _value;
-        balanceOf[_to] += _value;
-        allowance[_from][msg.sender] -= _value;
-        emit Transfer(_from, _to, _value);
-        return true;
-    }
-}
 
 contract TokenFarm {		
 	string public name = "Dapp Token Farm";
 	address public owner;
-	DappToken public dappToken;
+	HappyToken public happyToken;
 	DaiToken public daiToken;	
 
     uint256 month = 2629743;
@@ -95,8 +29,8 @@ contract TokenFarm {
   
 
 
-	constructor(DappToken _dappToken, DaiToken _daiToken) public {
-		dappToken = _dappToken;
+	constructor(HappyToken _happyToken, DaiToken _daiToken) payable {
+		happyToken = _happyToken;
 		daiToken = _daiToken;
 		owner = msg.sender;
 	}
@@ -123,6 +57,8 @@ contract TokenFarm {
 		// update stakng status
 		isStaking[msg.sender] = true;
 		hasStaked[msg.sender] = true;
+
+        
 	}
 
 
@@ -169,12 +105,38 @@ contract TokenFarm {
 			address recipient = stakers[i];
 			uint balance = stakingBalance[recipient];
 			if(balance > 0) {
-				dappToken.transfer(recipient, balance);
+				happyToken.transfer(recipient, balance);
             
         
 			}	
             		
 		}
 	}
+
+}
+
+interface DaiToken {
+    function transfer(address dst, uint wad) external returns (bool);
+    function balanceOf(address guy) external view returns (uint);
+    function totalSupply() external  returns (uint);
+    function allowance(address tokenlender, address spender) external  returns (uint remaining);
+    function approve(address spender, uint tokens) external returns (bool success);
+    function transferFrom(address from, address to, uint tokens) external returns (bool success);
+
+    event Transfer(address indexed from, address indexed to, uint tokens);
+    event Approval(address indexed tokenlender, address indexed spender, uint tokens);
+
+}
+
+interface HappyToken {
+    function transfer(address dst, uint wad) external returns (bool);
+    function balanceOf(address guy) external view returns (uint);
+    function totalSupply() external  returns (uint);
+    function allowance(address tokenlender, address spender) external  returns (uint remaining);
+    function approve(address spender, uint tokens) external returns (bool success);
+    function transferFrom(address from, address to, uint tokens) external returns (bool success);
+
+    event Transfer(address indexed from, address indexed to, uint tokens);
+    event Approval(address indexed tokenlender, address indexed spender, uint tokens);
 
 }
