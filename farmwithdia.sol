@@ -1,42 +1,24 @@
-// SPDX-License-Identifier: MIT
+pragma solidity ^0.5.0;
 
-pragma solidity ^0.8.0;
-
-
+import "./DappToken.sol";
+import "./DaiToken.sol";
 
 contract TokenFarm {		
 	string public name = "Dapp Token Farm";
 	address public owner;
-	HappyToken public happyToken;
+	DappToken public dappToken;
 	DaiToken public daiToken;	
-
-    uint256 month = 2629743;
-
-
-    struct Staker {
-
-        uint8 timestamp;
-    }
 
 	address[] public stakers;
 	mapping(address => uint) public stakingBalance;
 	mapping(address => bool) public hasStaked;
 	mapping(address => bool) public isStaking;
-    mapping(address => Staker) public stakes;
 
-   
-
-  
-
-
-	constructor(HappyToken _happyToken, DaiToken _daiToken) payable {
-		happyToken = _happyToken;
+	constructor(DappToken _dappToken, DaiToken _daiToken) public {
+		dappToken = _dappToken;
 		daiToken = _daiToken;
 		owner = msg.sender;
 	}
-
-    event Stake(address indexed owner, uint256 id, uint256 amount, uint256 time);
-    event UnStake(address indexed owner, uint256 id, uint256 amount, uint256 time, uint256 rewardTokens);
 
 	/* Stakes Tokens (Deposit): An investor will deposit the DAI into the smart contracts
 	to starting earning rewards.
@@ -57,23 +39,7 @@ contract TokenFarm {
 		// update stakng status
 		isStaking[msg.sender] = true;
 		hasStaked[msg.sender] = true;
-
-        
 	}
-
-
-    function calculateRate() private view returns(uint8) {
-        uint256 time = stakes[msg.sender].timestamp;
-        if(block.timestamp - time < month) {
-            return 100;
-        } else if(block.timestamp - time <  month * 2 ) {
-            return 150;
-        } else if(block.timestamp - time < 3 * month) {
-            return 175;
-        } else {
-            return 200;
-        }
-    }
 
 	// Unstaking Tokens (Withdraw): Withdraw money from DApp.
 	function unstakeTokens() public {
@@ -105,38 +71,9 @@ contract TokenFarm {
 			address recipient = stakers[i];
 			uint balance = stakingBalance[recipient];
 			if(balance > 0) {
-				happyToken.transfer(recipient, balance);
-            
-        
-			}	
-            		
+				dappToken.transfer(recipient, balance);
+			}			
 		}
 	}
-
-}
-
-interface DaiToken {
-    function transfer(address dst, uint wad) external returns (bool);
-    function balanceOf(address guy) external view returns (uint);
-    function totalSupply() external  returns (uint);
-    function allowance(address tokenlender, address spender) external  returns (uint remaining);
-    function approve(address spender, uint tokens) external returns (bool success);
-    function transferFrom(address from, address to, uint tokens) external returns (bool success);
-
-    event Transfer(address indexed from, address indexed to, uint tokens);
-    event Approval(address indexed tokenlender, address indexed spender, uint tokens);
-
-}
-
-interface HappyToken {
-    function transfer(address dst, uint wad) external returns (bool);
-    function balanceOf(address guy) external view returns (uint);
-    function totalSupply() external  returns (uint);
-    function allowance(address tokenlender, address spender) external  returns (uint remaining);
-    function approve(address spender, uint tokens) external returns (bool success);
-    function transferFrom(address from, address to, uint tokens) external returns (bool success);
-
-    event Transfer(address indexed from, address indexed to, uint tokens);
-    event Approval(address indexed tokenlender, address indexed spender, uint tokens);
 
 }
